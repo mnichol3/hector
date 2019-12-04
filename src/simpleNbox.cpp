@@ -719,6 +719,12 @@ void SimpleNbox::stashCValues( double t, const double c[] )
     // Store solver pools into our internal variables
 
     atmos_c.set( c[ SNBOX_ATMOS ], U_PGC );
+    
+    // Record the land C flux
+    const unitval npp_total = sum_npp();
+    const unitval rh_total = sum_rh();
+    
+    atmosland_flux_ts.set( t, npp_total - rh_total - lucEmissions.get( t ));
 
     // The solver just knows about one vegetation box, one detritus, and one
     // soil. So we need to apportion new veg C pool (set by the solver) to
@@ -727,7 +733,7 @@ void SimpleNbox::stashCValues( double t, const double c[] )
 
     // Apportioning is done by NPP and RH
     // i.e., biomes with higher values get more of any C change
-    const unitval npp_rh_total = sum_npp() + sum_rh(); // these are both positive
+    const unitval npp_rh_total = npp_total + rh_total; // these are both positive
     const unitval newveg( c[ SNBOX_VEG ], U_PGC );
     const unitval newdet( c[ SNBOX_DET ], U_PGC );
     const unitval newsoil( c[ SNBOX_SOIL ], U_PGC );
@@ -790,9 +796,9 @@ void SimpleNbox::stashCValues( double t, const double c[] )
         H_LOG( logger,Logger::DEBUG ) << t << "- have " << Ca << " want " <<  atmppmv.value( U_PPMV_CO2 ) << std::endl;
         H_LOG( logger,Logger::DEBUG ) << t << "- have " << atmos_c << " want " << atmos_cpool_to_match << "; residual = " << residual << std::endl;
 
-        // Transfer C from atmosphere to deep ocean and update our C and Ca variables
-        H_LOG( logger,Logger::DEBUG ) << "Sending residual of " << residual << " to deep ocean" << std::endl;
-        core->sendMessage( M_DUMP_TO_DEEP_OCEAN, D_OCEAN_C, message_data( residual ) );
+        // Transfer residual C from atmosphere to earth and update our C and Ca variables
+        H_LOG( logger,Logger::DEBUG ) << "Sending residual of " << residual << " to earth C pool" << std::endl;
+        earth_c.set( earth_c + residual, U_PGC );
         atmos_c = atmos_c - residual;
         Ca.set( atmos_c.value( U_PGC ) * PGC_TO_PPMVCO2, U_PPMV_CO2 );
     } else {
@@ -1117,10 +1123,6 @@ void SimpleNbox::record_state(double t)
     // that's where we're at.
     omodel->record_state(t);
     
-    // Record the land C flux
-    if ( !in_spinup ) {
-        atmosland_flux_ts.set( t, sum_npp() - sum_rh() - lucEmissions.get( ODEstartdate ));
-    }
 }
 
 // Set the preindustrial carbon value and adjust total mass to reflect the new
