@@ -347,15 +347,30 @@ unitval OceanComponent::getData( const std::string& varName,
 
     unitval returnval;
     
-    if ( varName != D_OCEAN_CFLUX && varName != D_OCEAN_C) {
-        H_ASSERT( date == Core::undefinedIndex(), "Date data not available for ocean_component (except ocean C flux" );
+    
+    // Array to hold varNames that can take date parameters. Avoids having 
+    // an if statement with a ton of conditions
+    std::string ts_vars[6] = { D_OCEAN_CFLUX, D_OCEAN_C, D_CARBON_DO, D_CARBON_IO,
+                               D_CARBON_HL, D_CARBON_LL };
+    
+    // Check if the given varName is in the list of vars that can take the date
+    // argument and perform H_ASSERT
+    std::string *var_check = std::find( std::begin( ts_vars ), std::end( ts_vars ), varName );
+    
+    // If var_check points to the end of the array, we know varName was not found
+    // and thus cannot handle a date argument. If it IS found, assert that the date
+    // is defined
+    if ( var_check == std::end( ts_vars ) ) {
+        H_ASSERT( date == Core::undefinedIndex(), "Date data not available for ocean_component::" + varName );
+    } else {
+        H_ASSERT( date != Core::undefinedIndex(), "Date required for ocean_component::" + varName )
     }
-
+    
     if( varName == D_OCEAN_CFLUX ) {
-        H_ASSERT( date != Core::undefinedIndex(), "Date required for ocean C flux" )
         returnval = annualflux_sum_ts.get( date );
     } else if( varName == D_OCEAN_C ) {
-        returnval = ocean_cpool_ts.get( date );
+        returnval = carbon_DO_ts.get( date ) + carbon_IO_ts.get( date );
+        returnval = returnval + carbon_HL_ts.get( date ) + carbon_LL_ts.get( date );
 	} else if( varName == D_HL_DO ) {
         returnval = surfaceHL.annual_box_fluxes[ &deep ] ;
     } else if( varName == D_PH_HL ) {
@@ -375,13 +390,13 @@ unitval OceanComponent::getData( const std::string& varName,
 	} else if( varName == D_DIC_LL ) {
         returnval = surfaceLL.mychemistry.convertToDIC( surfaceLL.get_carbon() );
 	} else if( varName == D_CARBON_HL ) {
-        returnval = surfaceHL.get_carbon();
+        returnval = carbon_HL_ts.get( date );
 	} else if( varName == D_CARBON_LL ) {
-        returnval = surfaceLL.get_carbon();
+        returnval = carbon_LL_ts.get( date );
 	} else if( varName == D_CARBON_IO ) {
-		returnval = inter.get_carbon();
+		returnval = carbon_IO_ts.get( date );
     } else if( varName == D_CARBON_DO ) {
-        returnval = deep.get_carbon();
+        returnval = carbon_DO_ts.get( date );
     } else if( varName == D_TT ) {
         returnval = tt;
     } else if( varName == D_TU ) {
@@ -554,7 +569,11 @@ void OceanComponent::stashCValues( double t, const double c[] ) {
 	deep.update_state();
     
     // Add carbon to oceanbox time series
-    ocean_cpool_ts.set( t, totalcpool() );
+    //ocean_cpool_ts.set( t, totalcpool() );
+    carbon_DO_ts.set( t, deep.get_carbon() );
+    carbon_IO_ts.set( t, inter.get_carbon() );
+    carbon_HL_ts.set( t, surfaceHL.get_carbon() );
+    carbon_LL_ts.set( t, surfaceLL.get_carbon() );
     
     // All good! t will be the start of the next timestep, so
     ODEstartdate = t;
@@ -597,6 +616,11 @@ void OceanComponent::reset(double time) throw(h_exception)
     annualflux_sumHL_ts.truncate(time);
     annualflux_sumLL_ts.truncate(time);
     lastflux_annualized_ts.truncate(time);
+    
+    carbon_DO_ts.truncate(time);
+    carbon_IO_ts.truncate(time);
+    carbon_HL_ts.truncate(time);
+    carbon_LL_ts.truncate(time);
 
     max_timestep_ts.truncate(time);
     reduced_timestep_timeout_ts.truncate(time);

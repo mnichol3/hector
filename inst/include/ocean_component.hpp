@@ -151,7 +151,11 @@ private:
     // Ocean conditions over time
     tseries<unitval> Tgav_ts;
     tseries<unitval> Ca_ts;
-    tseries<unitval> ocean_cpool_ts;
+    //tseries<unitval> ocean_cpool_ts;
+    tseries<unitval> carbon_DO_ts;
+    tseries<unitval> carbon_IO_ts;
+    tseries<unitval> carbon_HL_ts;
+    tseries<unitval> carbon_LL_ts;
 
     // Atmosphere-ocean flux
     tseries<unitval> annualflux_sum_ts;
