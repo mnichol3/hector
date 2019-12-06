@@ -349,7 +349,8 @@ unitval OceanComponent::getData( const std::string& varName,
     
     // Assert that the date parameter is appropriate for the given varName
     if ( varName != D_OCEAN_CFLUX && varName != D_OCEAN_C && varName != D_CARBON_DO &&
-         varName != D_CARBON_IO && varName != D_CARBON_HL && varName != D_CARBON_LL ) {
+         varName != D_CARBON_IO && varName != D_CARBON_HL && varName != D_CARBON_LL &&
+         varName != D_PH_HL && varName != D_PH_LL) {
              H_ASSERT( date == Core::undefinedIndex(), "Date data not available for ocean_component::" + varName );
         } else {
              H_ASSERT( date != Core::undefinedIndex(), "Date required for ocean_component::" + varName )
@@ -358,14 +359,18 @@ unitval OceanComponent::getData( const std::string& varName,
     if( varName == D_OCEAN_CFLUX ) {
         returnval = annualflux_sum_ts.get( date );
     } else if( varName == D_OCEAN_C ) {
+        // TODO pull carbon values from oceanbox tvectors instead of 
+        //      creating a separate tseries
         returnval = carbon_DO_ts.get( date ) + carbon_IO_ts.get( date );
         returnval = returnval + carbon_HL_ts.get( date ) + carbon_LL_ts.get( date );
 	} else if( varName == D_HL_DO ) {
         returnval = surfaceHL.annual_box_fluxes[ &deep ] ;
     } else if( varName == D_PH_HL ) {
-        returnval = surfaceHL.mychemistry.pH;
+        oceanbox temp_obox = surfaceHL_tv.get( date );
+        returnval = temp_obox.mychemistry.pH;
 	} else if( varName == D_PH_LL ) {
-        returnval = surfaceLL.mychemistry.pH;
+        oceanbox temp_obox = surfaceLL_tv.get( date );
+        returnval = temp_obox.mychemistry.pH;
 	} else if( varName == D_ATM_OCEAN_FLUX_HL ) {
 		returnval = unitval( annualflux_sumHL.value( U_PGC ), U_PGC_YR );
     } else if( varName == D_ATM_OCEAN_FLUX_LL ) {
@@ -558,7 +563,6 @@ void OceanComponent::stashCValues( double t, const double c[] ) {
 	deep.update_state();
     
     // Add carbon to oceanbox time series
-    //ocean_cpool_ts.set( t, totalcpool() );
     carbon_DO_ts.set( t, deep.get_carbon() );
     carbon_IO_ts.set( t, inter.get_carbon() );
     carbon_HL_ts.set( t, surfaceHL.get_carbon() );

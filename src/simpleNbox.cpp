@@ -586,9 +586,9 @@ unitval SimpleNbox::getData(const std::string& varName,
                 returnval = soil_c_tv.get(date).at(biome);
         }
     } else if( varNameParsed == D_NPP_FLUX0 ) {
-      H_ASSERT(date == Core::undefinedIndex(), "Date not allowed for npp_flux0" );
-      H_ASSERT(has_biome( biome ), biome_error);
-      returnval = npp_flux0.at(biome);
+        H_ASSERT(date == Core::undefinedIndex(), "Date not allowed for npp_flux0" );
+        H_ASSERT(has_biome( biome ), biome_error);
+        returnval = npp_flux0.at(biome);
     } else if( varNameParsed == D_FFI_EMISSIONS ) {
         H_ASSERT( date != Core::undefinedIndex(), "Date required for ffi emissions" );
         returnval = ffiEmissions.get( date );
