@@ -347,24 +347,13 @@ unitval OceanComponent::getData( const std::string& varName,
 
     unitval returnval;
     
-    
-    // Array to hold varNames that can take date parameters. Avoids having 
-    // an if statement with a ton of conditions
-    std::string ts_vars[6] = { D_OCEAN_CFLUX, D_OCEAN_C, D_CARBON_DO, D_CARBON_IO,
-                               D_CARBON_HL, D_CARBON_LL };
-    
-    // Check if the given varName is in the list of vars that can take the date
-    // argument and perform H_ASSERT
-    std::string *var_check = std::find( std::begin( ts_vars ), std::end( ts_vars ), varName );
-    
-    // If var_check points to the end of the array, we know varName was not found
-    // and thus cannot handle a date argument. If it IS found, assert that the date
-    // is defined
-    if ( var_check == std::end( ts_vars ) ) {
-        H_ASSERT( date == Core::undefinedIndex(), "Date data not available for ocean_component::" + varName );
-    } else {
-        H_ASSERT( date != Core::undefinedIndex(), "Date required for ocean_component::" + varName )
-    }
+    // Assert that the date parameter is appropriate for the given varName
+    if ( varName != D_OCEAN_CFLUX && varName != D_OCEAN_C && varName != D_CARBON_DO &&
+         varName != D_CARBON_IO && varName != D_CARBON_HL && varName != D_CARBON_LL ) {
+             H_ASSERT( date == Core::undefinedIndex(), "Date data not available for ocean_component::" + varName );
+        } else {
+             H_ASSERT( date != Core::undefinedIndex(), "Date required for ocean_component::" + varName )
+        }
     
     if( varName == D_OCEAN_CFLUX ) {
         returnval = annualflux_sum_ts.get( date );
