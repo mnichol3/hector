@@ -347,7 +347,7 @@ unitval OceanComponent::getData( const std::string& varName,
 
     unitval returnval;
     
-    if ( varName != D_OCEAN_CFLUX ) {
+    if ( varName != D_OCEAN_CFLUX && varName != D_OCEAN_C) {
         H_ASSERT( date == Core::undefinedIndex(), "Date data not available for ocean_component (except ocean C flux" );
     }
 
@@ -355,7 +355,7 @@ unitval OceanComponent::getData( const std::string& varName,
         H_ASSERT( date != Core::undefinedIndex(), "Date required for ocean C flux" )
         returnval = annualflux_sum_ts.get( date );
     } else if( varName == D_OCEAN_C ) {
-        returnval = totalcpool();
+        returnval = ocean_cpool_ts.get( date );
 	} else if( varName == D_HL_DO ) {
         returnval = surfaceHL.annual_box_fluxes[ &deep ] ;
     } else if( varName == D_PH_HL ) {
@@ -552,7 +552,10 @@ void OceanComponent::stashCValues( double t, const double c[] ) {
 	surfaceLL.update_state();
 	inter.update_state();
 	deep.update_state();
-
+    
+    // Add carbon to oceanbox time series
+    ocean_cpool_ts.set( t, totalcpool() );
+    
     // All good! t will be the start of the next timestep, so
     ODEstartdate = t;
 
