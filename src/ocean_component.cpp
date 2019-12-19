@@ -346,11 +346,17 @@ unitval OceanComponent::getData( const std::string& varName,
                                 const double date ) throw ( h_exception ) {
 
     unitval returnval;
+    oceanbox temp_obox;
+    unitval temp_flux;
     
     // Assert that the date parameter is appropriate for the given varName
-    if ( varName != D_OCEAN_CFLUX && varName != D_OCEAN_C && varName != D_CARBON_DO &&
-         varName != D_CARBON_IO && varName != D_CARBON_HL && varName != D_CARBON_LL &&
-         varName != D_PH_HL && varName != D_PH_LL )
+    // TODO: change to array?
+    if ( varName != D_OCEAN_CFLUX && varName != D_OCEAN_C   && varName != D_CARBON_DO &&
+         varName != D_CARBON_IO   && varName != D_CARBON_HL && varName != D_CARBON_LL &&
+         varName != D_PH_HL       && varName != D_PH_LL     && varName != D_PCO2_LL &&
+         varName != D_PCO2_HL     && varName != D_DIC_HL    && varName != D_DIC_LL &&
+         varName != D_TEMP_LL     && varName != D_TEMP_HL   && varName != D_CO3_LL &&
+         varName != D_CO3_HL)
     {
         H_ASSERT( date == Core::undefinedIndex(), "Date data not available for ocean_component::" + varName );
              
@@ -360,97 +366,79 @@ unitval OceanComponent::getData( const std::string& varName,
     
     if( varName == D_OCEAN_CFLUX ) {
         returnval = annualflux_sum_ts.get( date );
-        
     } else if( varName == D_OCEAN_C ) {
         returnval = carbon_DO_ts.get( date ) + carbon_IO_ts.get( date ) +
                     carbon_HL_ts.get( date ) + carbon_LL_ts.get( date );
-        
 	} else if( varName == D_HL_DO ) {
         returnval = surfaceHL.annual_box_fluxes[ &deep ] ;
-        
     } else if( varName == D_PH_HL ) {
-        oceanbox temp_obox = surfaceHL_tv.get( date );
+        temp_obox = surfaceHL_tv.get( date );
         returnval = temp_obox.mychemistry.pH;
-        
 	} else if( varName == D_PH_LL ) {
-        oceanbox temp_obox = surfaceLL_tv.get( date );
+        temp_obox = surfaceLL_tv.get( date );
         returnval = temp_obox.mychemistry.pH;
-        
 	} else if( varName == D_ATM_OCEAN_FLUX_HL ) {
-		returnval = unitval( annualflux_sumHL.value( U_PGC ), U_PGC_YR );
-        
+		//returnval = unitval( annualflux_sumHL.value( U_PGC ), U_PGC_YR );
+        temp_flux = annualflux_sumHL_ts.get( date )
+        returnval = unitval( temp_flux.value( U_PGC ), U_PGC_YR );
     } else if( varName == D_ATM_OCEAN_FLUX_LL ) {
-		returnval = unitval( annualflux_sumLL.value( U_PGC ), U_PGC_YR );
-        
+		//returnval = unitval( annualflux_sumLL.value( U_PGC ), U_PGC_YR );
+        temp_flux = annualflux_sumLL_ts.get( date )
+        returnval = unitval( temp_flux.value( U_PGC ), U_PGC_YR );
 	} else if( varName == D_PCO2_HL ) {
-        returnval = surfaceHL.mychemistry.PCO2o;
-        
+        temp_obox = surfaceHL_tv.get( date );
+        returnval = temp_obox.mychemistry.PCO2o;
 	} else if( varName == D_PCO2_LL ) {
-		returnval = surfaceLL.mychemistry.PCO2o;
-        
+        temp_obox = surfaceLL_tv.get( date );
+		returnval = temp_obox.mychemistry.PCO2o;
     } else if( varName == D_DIC_HL ) {
-        returnval = surfaceHL.mychemistry.convertToDIC( surfaceHL.get_carbon() );
-        
+        temp_obox = surfaceHL_tv.get( date );
+        returnval = temp_obox.mychemistry.convertToDIC( surfaceHL.get_carbon() );
 	} else if( varName == D_DIC_LL ) {
-        returnval = surfaceLL.mychemistry.convertToDIC( surfaceLL.get_carbon() );
-        
+        temp_obox = surfaceLL_tv.get( date );
+        returnval = temp_obox.mychemistry.convertToDIC( surfaceLL.get_carbon() );
 	} else if( varName == D_CARBON_HL ) {
         returnval = carbon_HL_ts.get( date );
-        
 	} else if( varName == D_CARBON_LL ) {
         returnval = carbon_LL_ts.get( date );
-        
 	} else if( varName == D_CARBON_IO ) {
 		returnval = carbon_IO_ts.get( date );
-        
     } else if( varName == D_CARBON_DO ) {
         returnval = carbon_DO_ts.get( date );
-        
     } else if( varName == D_TT ) {
         returnval = tt;
-        
     } else if( varName == D_TU ) {
         returnval = tu;
-        
     } else if( varName == D_TID ) {
         returnval = tid;
-        
     } else if( varName == D_TWI ) {
         returnval = twi;
-        
 	} else if( varName == D_OMEGACA_HL ) {
         returnval = surfaceHL.mychemistry.OmegaCa;
-        
 	} else if( varName == D_OMEGACA_LL ) {
 		returnval = surfaceLL.mychemistry.OmegaCa;
-        
 	} else if( varName == D_OMEGAAR_HL ) {
         returnval = surfaceHL.mychemistry.OmegaAr;
-        
 	} else if( varName == D_OMEGAAR_LL ) {
         returnval = surfaceLL.mychemistry.OmegaAr;
-        
     } else if( varName == D_REVELLE_HL ) {
         returnval = surfaceHL.calc_revelle();
-        
     } else if( varName == D_REVELLE_LL ) {
         returnval = surfaceLL.calc_revelle();
-        
     } else if( varName == D_TEMP_HL ) {
-		returnval = surfaceHL.get_Tbox();
-        
+        temp_obox = surfaceHL_tv.get( date );
+		returnval = temp_obox.get_Tbox();
 	} else if( varName == D_TEMP_LL ) {
-		returnval = surfaceLL.get_Tbox();
-        
+		temp_obox = surfaceLL_tv.get( date );
+		returnval = temp_obox.get_Tbox();
 	} else if( varName == D_CO3_LL ) {
-		returnval = surfaceLL.mychemistry.CO3;
-        
+        temp_obox = surfaceLL_tv.get( date );
+		returnval = temp_obox.mychemistry.CO3;
 	} else if( varName == D_CO3_HL ) {
-		returnval = surfaceHL.mychemistry.CO3;
-        
+        temp_obox = surfaceHL_tv.get( date );
+		returnval = temp_obox.mychemistry.CO3;
     } else if( varName == D_TIMESTEPS ) {
         returnval = unitval( timesteps, U_UNITLESS );
-        
     } else {
         H_THROW( "Caller is requesting unknown variable: " + varName );
     }
