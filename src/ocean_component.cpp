@@ -378,13 +378,13 @@ unitval OceanComponent::getData( const std::string& varName,
         temp_obox = surfaceLL_tv.get( date );
         returnval = temp_obox.mychemistry.pH;
 	} else if( varName == D_ATM_OCEAN_FLUX_HL ) {
-		//returnval = unitval( annualflux_sumHL.value( U_PGC ), U_PGC_YR );
-        temp_flux = annualflux_sumHL_ts.get( date );
-        returnval = unitval( temp_flux.value( U_PGC ), U_PGC_YR );
+		returnval = unitval( annualflux_sumHL.value( U_PGC ), U_PGC_YR );
+        // temp_flux = annualflux_sumHL_ts.get( date );
+        // returnval = unitval( temp_flux.value( U_PGC ), U_PGC_YR );
     } else if( varName == D_ATM_OCEAN_FLUX_LL ) {
-		//returnval = unitval( annualflux_sumLL.value( U_PGC ), U_PGC_YR );
-        temp_flux = annualflux_sumLL_ts.get( date );
-        returnval = unitval( temp_flux.value( U_PGC ), U_PGC_YR );
+		returnval = unitval( annualflux_sumLL.value( U_PGC ), U_PGC_YR );
+        // temp_flux = annualflux_sumLL_ts.get( date );
+        // returnval = unitval( temp_flux.value( U_PGC ), U_PGC_YR );
 	} else if( varName == D_PCO2_HL ) {
         temp_obox = surfaceHL_tv.get( date );
         returnval = temp_obox.mychemistry.PCO2o;
