@@ -157,6 +157,10 @@ void OHComponent::run( const double runToDate ) throw ( h_exception )
    double toh = 0.0;
    if ( previous_ch4 != M0 ) // if we are not at the first time
    {
+       
+   H_LOG( logger, Logger::DEBUG ) << "previous_ch4: " << previous_ch4 << ", log: " << log( previous_ch4 ) << std::endl;
+   H_LOG( logger, Logger::DEBUG ) << "M0.value(U_PPBV_CH4): " << M0.value(U_PPBV_CH4) << ", log: " << log( M0.value(U_PPBV_CH4) ) << std::endl;
+   
    const double a =  CCH4 * ( ( -1.0 * log( previous_ch4 ) ) + log( M0.value(U_PPBV_CH4) ) );
    const double b = CNOX * ( ( -1.0 * current_nox ) + NOX_emissions.get( NOX_emissions.firstdate() ).value( U_TG_N ) );
    const double c = CCO * ( ( -1.0 * + current_co ) + CO_emissions.get( CO_emissions.firstdate() ).value( U_TG_CO ) );
