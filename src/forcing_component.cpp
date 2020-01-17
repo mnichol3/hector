@@ -298,7 +298,7 @@ void ForcingComponent::run( const double runToDate ) throw ( h_exception ) {
         // Equations from Joos et al., 2001
         if( core->checkCapability( D_ATMOSPHERIC_CH4 ) && core->checkCapability( D_ATMOSPHERIC_N2O ) ) {
             
-            // Eq. A9 from Joos et al., 2001
+            // Eq. A9 from Joos et al., 2001 (needed for original n2o eq)
             #define f(M,N) 0.47 * log( 1 + 2.01 * 1e-5 * pow( M * N, 0.75 ) + 5.31 * 1e-15 * M * pow( M * N, 1.52 ) )
             
             // Current & historical methane concentrations
@@ -308,6 +308,7 @@ void ForcingComponent::run( const double runToDate ) throw ( h_exception ) {
             double Na = core->sendMessage( M_GETDATA, D_ATMOSPHERIC_N2O, message_data( runToDate ) ).value( U_PPBV_N2O );
             double N0 = core->sendMessage( M_GETDATA, D_PREINDUSTRIAL_N2O ).value( U_PPBV_N2O );
             
+            // Old ch4 RF eq from Joos 2001
             // double fch4 =  0.036 * ( sqrt( Ma ) - sqrt( M0 ) ) - ( f( Ma, N0 ) - f( M0, N0 ) );
             // forcings[D_RF_CH4].set( fch4, U_W_M2 );
             
@@ -317,8 +318,10 @@ void ForcingComponent::run( const double runToDate ) throw ( h_exception ) {
             double mbar = 0.5 * ( Ma + M0 );
             double nbar = 0.5 * ( Na + N0 );
             
-            double fch4 = ( ( a3 * mbar ) + ( b3 * nbar ) + 0.043 ) * ( sqrt( Ma ) - sqrt( M0 ) ); 
+            double fch4 = ( ( a3 * mbar ) + ( b3 * nbar ) + 0.043 ) * ( sqrt( Ma ) - sqrt( M0 ) );
+            forcings[D_RF_CH4].set( fch4, U_W_M2 );
             
+            // n2o equation is still from Joos et al., 2001 at the moment (17 Jan 2020)
             double fn2o =  0.12 * ( sqrt( Na ) - sqrt( N0 ) ) - ( f( M0, Na ) - f( M0, N0 ) );
             forcings[D_RF_N2O].set( fn2o, U_W_M2 );
             
