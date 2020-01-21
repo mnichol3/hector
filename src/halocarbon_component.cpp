@@ -58,7 +58,6 @@ void HalocarbonComponent::init( Core* coreptr ) {
 
     //! \remark Inform core that we can provide forcing data
     core->registerCapability( D_RF_PREFIX+myGasName, getComponentName() );
-    core->registerCapability(myGasName+EMISSIONS_EXTENSION, getComponentName());
     // inform core that we can accept emissions for this gas
     core->registerInput(myGasName+EMISSIONS_EXTENSION, getComponentName());
 
