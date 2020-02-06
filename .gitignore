@@ -70,3 +70,6 @@ vignettes/rsconnect
 
 # vignette caches
 /vignettes/*_cache
+
+# unused project files
+project_files/
