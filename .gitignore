@@ -66,3 +66,5 @@ R/batchrunner/*.pdf
 R/batchrunner/*.csv
 .Rapp.history
 
+# unused project files
+project_files/
