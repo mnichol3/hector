@@ -14,10 +14,10 @@ export HROOT
 
 ## Boost root
 ifeq ($(strip $(BOOSTVERSION)),)
-BOOSTVERSION	= 1_52_0
+BOOSTVERSION	= 1_72_0
 endif
 ifeq ($(strip $(BOOSTROOT)),)
-BOOSTROOT	= $(HOME)/src/boost_$(BOOSTVERSION)
+BOOSTROOT	= $(HOME)/libs/boost_$(BOOSTVERSION)
 endif
 
 ## Gtest root
@@ -28,7 +28,7 @@ GTLIB	= $(GTROOT)/lib/.libs
 
 ## Location of GSL (default is /usr/local -- can be overridden by environment)
 ifeq ($(strip $(GSLROOT)),)
-GSLROOT	= /usr/local
+GSLROOT	= $(HOME)/libs/gsl
 endif
 
 ## Set the GSL include and library locations.  There is a special case for Evergreen users.
