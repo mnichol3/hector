@@ -16,10 +16,10 @@ export HROOT
 
 ## Boost root
 ifeq ($(strip $(BOOSTVERSION)),)
-BOOSTVERSION	= 1_63_0
+BOOSTVERSION	= 1_72_0
 endif
 ifeq ($(strip $(BOOSTROOT)),)
-BOOSTROOT	= $(HOME)/src/boost_$(BOOSTVERSION)
+BOOSTROOT	= $(HOME)/libs/boost_$(BOOSTVERSION)
 endif
 ifeq ($(strip $(BOOSTLIB)),)
 ## Default is the location used by the build scripts included with Boost, but
