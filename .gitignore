@@ -46,7 +46,7 @@ xcodeuserstate
 xcuserdata
 
 # Project files
-project_files/*.*
+project_files/
 Release
 ipch
 Run Test Cases
@@ -65,6 +65,3 @@ output/*.csv
 R/batchrunner/*.pdf
 R/batchrunner/*.csv
 .Rapp.history
-
-# unused project files
-project_files/
