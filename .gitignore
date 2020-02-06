@@ -31,6 +31,7 @@ source/hector-api
 
 # Hector logs
 logs/*.*
+source/logs/
 
 # OS-specific files
 .DS_Store
@@ -63,6 +64,7 @@ libs/
 
 # Output
 output/output*
+source/output
 
 # R
 .Rhistory
